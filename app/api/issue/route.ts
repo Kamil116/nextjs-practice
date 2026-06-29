@@ -3,6 +3,9 @@ import { db } from '@/db'
 import { issues } from '@/db/schema'
 import { getCurrentUser } from '@/lib/dal'
 
+
+export const dynamic = 'force-dynamic'
+
 export async function GET() {
   try {
     const issues = await db.query.issues.findMany()
