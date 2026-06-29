@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { HomeIcon, PlusIcon, LogInIcon } from 'lucide-react'
+import { HomeIcon, PlusIcon } from 'lucide-react'
 import UserEmail from './UserEmail'
 import { Suspense } from 'react'
 import NavLink from './NavLink'

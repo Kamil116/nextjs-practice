@@ -3,7 +3,7 @@ import { db } from '@/db'
 import { issues } from '@/db/schema'
 import { getCurrentUser } from '@/lib/dal'
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     const issues = await db.query.issues.findMany()
     return NextResponse.json({data: {issues}})
@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
   }
 }
 
-export async function POST(req: NextResponse) {
+export async function POST(req: NextRequest) {
   try {
     const user = await getCurrentUser()
     const newIssueData = await req.json()
