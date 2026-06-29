@@ -8,6 +8,7 @@ import Button from '@/components/ui/Button'
 import { ArrowLeftIcon, Edit2Icon } from 'lucide-react'
 import DeleteIssueButton from '@/components/DeleteIssueButton'
 
+export const dynamic = 'force-dynamic'
 export default async function IssuePage({ params}: {params: Promise<{id: string}>}) {
   const { id } = await params
   const issue = await getIssue(parseInt(id))
