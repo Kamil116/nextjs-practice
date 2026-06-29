@@ -7,6 +7,7 @@ import { formatRelativeTime } from '@/lib/utils'
 import { Priority, Status } from '@/lib/types'
 import { ISSUE_STATUS, ISSUE_PRIORITY } from '@/db/schema'
 
+export const dynamic = 'force-dynamic'
 export default async function DashboardPage() {
     const issues = await getIssues()
 
