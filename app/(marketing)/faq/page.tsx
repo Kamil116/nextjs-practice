@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import Button from '@/components/ui/Button'
+import { getCurrentUser } from '@/lib/dal'
 
 const faqs = [
   {
@@ -34,7 +35,9 @@ const faqs = [
   },
 ]
 
-export default function FaqPage() {
+export default async function FaqPage() {
+  const user = await getCurrentUser()
+
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="max-w-2xl mx-auto text-center mb-16">
@@ -67,11 +70,13 @@ export default function FaqPage() {
           Still have questions?
         </h2>
         <p className="text-gray-600 dark:text-gray-300 mb-6">
-          Create an account and explore Mode, or check our documentation.
+          {user
+            ? 'Head to your dashboard to manage issues, or view our pricing plans.'
+            : 'Create an account and explore Mode, or check our pricing plans.'}
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link href="/signup">
-            <Button>Sign up</Button>
+          <Link href={user ? '/dashboard' : '/signup'}>
+            <Button>{user ? 'Go to Dashboard' : 'Sign up'}</Button>
           </Link>
           <Link href="/pricing">
             <Button variant="outline">View Pricing</Button>
