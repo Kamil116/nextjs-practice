@@ -14,6 +14,8 @@ vi.mock('@/lib/auth', () => ({
   deleteSession: vi.fn(),
 }))
 
+const initialState = { success: false, message: '', errors: undefined }
+
 describe('auth server actions', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -24,7 +26,7 @@ describe('auth server actions', () => {
     formData.set('email', 'not-an-email')
     formData.set('password', 'password123')
 
-    const result = await signIn(formData)
+    const result = await signIn(initialState, formData)
 
     expect(result.success).toBe(false)
     expect(result.errors?.email).toBeDefined()
@@ -37,7 +39,7 @@ describe('auth server actions', () => {
     formData.set('email', 'user@example.com')
     formData.set('password', 'password123')
 
-    const result = await signIn(formData)
+    const result = await signIn(initialState, formData)
 
     expect(result.success).toBe(false)
     expect(result.message).toBe('Invalid email or password')
@@ -57,7 +59,7 @@ describe('auth server actions', () => {
     formData.set('email', 'user@example.com')
     formData.set('password', 'password123')
 
-    const result = await signIn(formData)
+    const result = await signIn(initialState, formData)
 
     expect(result.success).toBe(true)
     expect(createSession).toHaveBeenCalledWith('user-1')

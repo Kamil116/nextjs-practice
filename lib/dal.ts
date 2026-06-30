@@ -1,7 +1,7 @@
 // dal = data access layer
 import { db } from '@/db'
 import { getSession } from './auth'
-import { eq } from 'drizzle-orm'
+import { eq, sql } from 'drizzle-orm'
 import { issues, users } from '@/db/schema'
 import { cacheTag } from 'next/dist/server/use-cache/cache-tag'
 import { cache } from 'react'
@@ -26,13 +26,15 @@ export const getCurrentUser= cache(async () => {
 })
 
 export const getUserByEmail = async (email: string) => {
+  const normalizedEmail = email.trim().toLowerCase()
+
   try {
     return await db.query.users.findFirst({
-      where: eq(users.email, email)
+      where: sql`lower(${users.email}) = ${normalizedEmail}`,
     })
   } catch (e) {
-    console.error(e)
-    return null
+    console.error('getUserByEmail failed:', e)
+    throw e
   }
 }
 

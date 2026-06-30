@@ -20,6 +20,10 @@ export async function verifyPassword(password: string, hashedPassword: string) {
   return compare(password, hashedPassword)
 }
 
+// Secure cookies only on Vercel (HTTPS). Local `npm run start` uses HTTP —
+// browsers reject secure cookies without HTTPS.
+const useSecureCookies = Boolean(process.env.VERCEL)
+
 // Create a new user
 export async function createUser(email: string, password: string) {
   const hashedPassword = await hashPassword(password)
@@ -28,14 +32,19 @@ export async function createUser(email: string, password: string) {
   try {
     await db.insert(users).values({
       id,
-      email,
+      email: email.trim().toLowerCase(),
       password: hashedPassword,
     })
 
-    return { id, email }
+    return { id, email: email.trim().toLowerCase() }
   } catch (error) {
     console.error('Error creating user:', error)
-    return null
+    const message =
+      error instanceof Error ? error.message : 'Unknown database error'
+    if (message.includes('unique') || message.includes('duplicate')) {
+      return null
+    }
+    throw error
   }
 }
 
@@ -51,7 +60,7 @@ export async function createSession(userId: string) {
       name: 'auth_token',
       value: token,
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: useSecureCookies,
       maxAge: 60 * 60 * 24 * 7, // 1 week
       path: '/',
       sameSite: 'lax',
