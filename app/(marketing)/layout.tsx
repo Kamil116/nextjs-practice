@@ -1,6 +1,7 @@
 import Link from 'next/link'
+import { Suspense } from 'react'
 import { Timestamp } from '@/components/Timestamp'
-import Button from '@/components/ui/Button'
+import MarketingHeaderAuth from '@/components/MarketingHeaderAuth'
 
 export default async function MarketingLayout({
                                                   children,
@@ -37,14 +38,13 @@ export default async function MarketingLayout({
                       </nav>
                   </div>
                   <div className="flex items-center gap-4">
-                      <div className="flex items-center space-x-4">
-                          <Link href="/signin">
-                              <Button variant="outline">Sign in</Button>
-                          </Link>
-                          <Link href="/signup">
-                              <Button>Sign up</Button>
-                          </Link>
-                      </div>
+                      <Suspense
+                        fallback={
+                          <div className="h-10 w-32 animate-pulse rounded-md bg-gray-100 dark:bg-gray-800" />
+                        }
+                      >
+                        <MarketingHeaderAuth />
+                      </Suspense>
                   </div>
               </div>
           </header>
