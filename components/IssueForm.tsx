@@ -17,7 +17,6 @@ import { createIssue, type ActionResponse, updateIssue } from '@/app/actions/iss
 
 interface IssueFormProps {
   issue?: Issue
-  userId: string
   isEditing?: boolean
 }
 
@@ -29,7 +28,6 @@ const initialState: ActionResponse = {
 
 export default function IssueForm({
                                     issue,
-                                    userId,
                                     isEditing = false,
                                   }: IssueFormProps) {
   const router = useRouter()
@@ -49,7 +47,6 @@ export default function IssueForm({
         | 'in_progress'
         | 'done',
       priority: formData.get('priority') as 'low' | 'medium' | 'high',
-      userId,
     }
 
     try {
@@ -61,7 +58,9 @@ export default function IssueForm({
       // Handle successful submission
       if (result.success) {
         router.refresh()
-        if (!isEditing) {
+        if (isEditing) {
+          router.push(`/issues/${issue!.id}`)
+        } else {
           router.push('/dashboard')
         }
       }

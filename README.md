@@ -4,26 +4,27 @@ A project management application built with Next.js, inspired by Linear.
 
 ## Features
 
-- User authentication (sign up, sign in, sign out)
+- User authentication (sign up, sign in, sign out) via JWT cookies
 - Issue management (create, update, delete)
+- Protected dashboard and issue routes
 - Modern UI with Tailwind CSS
 - Responsive design
 
 ## Tech Stack
 
-- [Next.js 13+](https://nextjs.org/) with App Router
+- [Next.js 16](https://nextjs.org/) with App Router
 - [TypeScript](https://www.typescriptlang.org/)
 - [Tailwind CSS](https://tailwindcss.com/) for styling
-- [Prisma](https://www.prisma.io/) for database ORM
-- [PostgreSQL](https://www.postgresql.org/) for database
-- [NextAuth.js](https://next-auth.js.org/) for authentication
+- [Drizzle ORM](https://orm.drizzle.team/) with [Neon](https://neon.tech/) PostgreSQL
+- [jose](https://github.com/panva/jose) for JWT authentication
+- [Vitest](https://vitest.dev/) for testing
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js 16+ and npm/yarn
-- PostgreSQL database (or use a service like [Neon](https://neon.tech/))
+- Node.js 18+ and npm
+- PostgreSQL database ([Neon](https://neon.tech/) recommended)
 
 ### Installation
 
@@ -38,41 +39,88 @@ A project management application built with Next.js, inspired by Linear.
 
    ```bash
    npm install
-   # or
-   yarn install
    ```
 
-3. Copy the `.env.example` file to `.env.local` and update the values
+3. Copy the environment file and set your values
 
    ```bash
    cp .env.example .env.local
    ```
 
-4. Set up your database and update the `DATABASE_URL` in `.env.local`
+   Required variables:
 
-5. Run database migrations
+   | Variable | Description |
+   |----------|-------------|
+   | `DATABASE_URL` | Neon PostgreSQL connection string |
+   | `JWT_SECRET` | Secret for signing JWTs (minimum 32 characters) |
+
+   Generate a secure JWT secret:
 
    ```bash
-   npx prisma db push
+   openssl rand -base64 32
    ```
 
-6. Start the development server
+4. Push the database schema to Neon
+
+   ```bash
+   npm run db:push
+   ```
+
+   Optionally seed sample data:
+
+   ```bash
+   npm run seed
+   ```
+
+5. Start the development server
 
    ```bash
    npm run dev
-   # or
-   yarn dev
    ```
 
-7. Open [http://localhost:3000](http://localhost:3000) in your browser
+6. Open [http://localhost:3000](http://localhost:3000) in your browser
+
+## Deploying to Vercel
+
+1. Import the project into [Vercel](https://vercel.com/)
+2. Add environment variables in **Project Settings → Environment Variables**:
+   - `DATABASE_URL` — your Neon connection string
+   - `JWT_SECRET` — at least 32 characters (use `openssl rand -base64 32`)
+3. After the first deploy (or before), apply the schema to your production database:
+
+   ```bash
+   DATABASE_URL="your-neon-url" npm run db:push
+   ```
+
+   Run this locally against the production Neon URL, or use Neon's SQL editor. Vercel does not run migrations automatically — schema changes must be applied manually with `db:push` or Drizzle migrations.
+
+4. Redeploy if needed after env vars are set
+
+## Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start development server |
+| `npm run build` | Production build |
+| `npm run start` | Start production server |
+| `npm run db:push` | Push Drizzle schema to the database |
+| `npm run db:studio` | Open Drizzle Studio |
+| `npm run seed` | Seed the database with sample data |
+| `npm test` | Run tests |
+| `npm run test:coverage` | Run tests with coverage |
 
 ## Project Structure
 
-- `app/` - Next.js App Router pages and layouts
-- `app/api/` - API routes for authentication and issues
-- `app/components/` - Reusable UI components
-- `lib/` - Utility functions and libraries
-- `prisma/` - Database schema and client
+- `app/` — Next.js App Router pages, layouts, and server actions
+- `app/api/` — REST API routes for issues
+- `components/` — Reusable UI components
+- `db/` — Drizzle schema and database client
+- `lib/` — Auth, JWT, data access layer, utilities
+- `middleware.ts` — JWT verification and route protection
+
+## Authentication
+
+Sessions are stored as HTTP-only `auth_token` cookies containing a signed JWT. Protected routes (`/dashboard`, `/issues/*`, `/api/*`) require a valid token. API clients can also send `Authorization: Bearer <token>`.
 
 ## License
 
